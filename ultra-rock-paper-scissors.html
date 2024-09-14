@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra Rock Paper Scissors</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            color: white;
+            background-color: rgb(24, 24, 24);;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        .hidden {
+            display: none;
+        }
+        #player-prompt {
+            color: orangered;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Ultra Rock Paper Scissors</h1>
+    
+    <div id="game">
+        <h2 id="player-prompt">Player 1, choose your hand:</h2>
+        <div id="choices">
+            <!-- Dynamically generated buttons for hand choices -->
+        </div>
+        <p id="result" class="hidden"></p>
+        <button id="restart" class="hidden">Play Again</button>
+    </div>
+
+    <script>
+        const hands = [
+            "gun", "rock", "fire", "scissors", "snake", 
+            "human", "tree", "wolf", "sponge", "paper", 
+            "air", "water", "dragon", "devil", "lightning"
+        ];
+
+        let player1Choice = null;
+        let player2Choice = null;
+        let currentPlayer = 1;
+
+        const beats = getBeatsList(hands);
+
+        function getBeatsList(hands) {
+            const beatsDict = {};
+            const length = hands.length;
+            for (let i = 0; i < length; i++) {
+                const beatList = [];
+                for (let j = 1; j <= 7; j++) {
+                    beatList.push(hands[(i + j) % length]);
+                }
+                beatsDict[hands[i]] = beatList;
+            }
+            return beatsDict;
+        }
+
+        function createButtons() {
+            const choicesDiv = document.getElementById("choices");
+            hands.forEach((hand, index) => {
+                const button = document.createElement("button");
+                button.innerText = `[${index + 1}] ${hand}`;
+                button.onclick = () => chooseHand(hand);
+                choicesDiv.appendChild(button);
+            });
+        }
+
+        function chooseHand(hand) {
+            if (currentPlayer === 1) {
+                player1Choice = hand;
+                document.getElementById("player-prompt").innerText = "Player 2, choose your hand:";
+                currentPlayer = 2;
+            } else if (currentPlayer === 2) {
+                player2Choice = hand;
+                determineWinner();
+            }
+        }
+
+        function determineWinner() {
+            const result = document.getElementById("result");
+            if (player1Choice === player2Choice) {
+                result.innerText = `It's a tie! Both players chose ${player1Choice}.`;
+            } else if (beats[player1Choice].includes(player2Choice)) {
+                result.innerText = `Player 1 wins! Player 1 chose ${player1Choice}, Player 2 chose ${player2Choice}.`;
+            } else {
+                result.innerText = `Player 2 wins! Player 1 chose ${player1Choice}, Player 2 chose ${player2Choice}.`;
+            }
+            result.classList.remove("hidden");
+            document.getElementById("restart").classList.remove("hidden");
+        }
+
+        function restartGame() {
+            player1Choice = null;
+            player2Choice = null;
+            currentPlayer = 1;
+            document.getElementById("player-prompt").innerText = "Player 1, choose your hand:";
+            document.getElementById("result").classList.add("hidden");
+            document.getElementById("restart").classList.add("hidden");
+        }
+
+        document.getElementById("restart").onclick = restartGame;
+
+        // Initialize game buttons
+        createButtons();
+
+    </script>
+</body>
+</html>
